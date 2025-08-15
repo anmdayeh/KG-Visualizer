@@ -1,0 +1,37 @@
+{
+  "Copy of Produced Straws begræns (003).csv": [
+    "Variable",
+    "Description"
+  ],
+  "Copy of Produced Straws begræns.csv": [
+    "Dato",
+    "Fødselsdato",
+    "Alder Mdr",
+    "Journalnummer",
+    "MlRåsæd",
+    "KoncRåsæd",
+    "VitRåsæd",
+    "StråProduceret",
+    "KoncStrå",
+    "Vitoptsæd",
+    "Vit3timer",
+    "CasaMotopsæd",
+    "ProgresivMotoptsæd",
+    "CasaMot3timeroptsæd",
+    "ProgresivMot3timeroptsæd",
+    "%Renhed",
+    "IA",
+    "IA 3 h",
+    "Afl24timer",
+    "Afl48timer",
+    "Godkendelse",
+    "Kassationsårsag",
+    "OpUltra-Sep",
+    "Produkt",
+    "Navn",
+    "Stambogsnummer",
+    "Race",
+    "Tyrestation",
+    "Evalueringsdato"
+  ]
+}

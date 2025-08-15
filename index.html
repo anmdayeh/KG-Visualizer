@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Group & Feature Canvas (Final v2)</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <div id="app">
+    <div id="sidebar" class="compact">
+      <h2 class="sidebar-title">Controls</h2>
+      <div class="section">
+        <details open>
+          <summary>Data</summary>
+          <div class="controls">
+            <label class="file-btn">
+              Import Source JSON
+              <input type="file" id="import-source" accept=".json"/>
+            </label>
+            <label class="file-btn">
+              Import State JSON
+              <input type="file" id="import-state" accept=".json"/>
+            </label>
+            <div class="row gap">
+              <button id="export-state">Export State</button>
+              <button id="export-image">Export PNG</button>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <div class="section">
+        <details open>
+          <summary>Add</summary>
+          <div class="controls">
+            <label>New group name</label>
+            <input id="new-group-name" placeholder="e.g., QC_2024"/>
+            <button id="add-group">Add Group</button>
+
+            <label>Feature’s group</label>
+            <select id="feature-group"></select>
+
+            <label>New feature name</label>
+            <input id="new-feature-name" placeholder="e.g., VIAAF"/>
+
+            <button id="add-feature">Add Feature</button>
+          </div>
+        </details>
+      </div>
+
+      <div class="section">
+        <details open>
+          <summary>Visibility & Notes</summary>
+          <div class="controls">
+            <button id="toggle-all-edges">Hide/Show All Connections</button>
+            <label style="display:flex;gap:8px;align-items:center;">
+              <input type="checkbox" id="show-notes-toggle" checked/> Show notes on hover
+            </label>
+            <label style="display:flex;gap:8px;align-items:center;">
+              <input type="checkbox" id="show-note-indicators" checked/> Show note indicators
+            </label>
+          </div>
+          <div id="visibility-tree"></div>
+        </details>
+      </div>
+
+      <div class="section">
+        <details open>
+          <summary>Help</summary>
+          <div class="controls">
+            <ul class="help">
+              <li>Drag nodes to move; scroll to zoom; right-click a node to start linking then click another node to connect.</li>
+              <li>Click a node to center the canvas on it (connections for that node still toggle on click).</li>
+              <li>Hover a node to highlight its connections; click a node to toggle its connections' visibility.</li>
+              <li>Hold <b>Shift</b> while dragging a node to resize it.</li>
+              <li>Ctrl+Z / Ctrl+Y for undo / redo.</li>
+              <li>Double-click an edge to edit its label/image (double-click anywhere along the line).</li>
+              <li>Use the note icon to add/view notes for groups & features; notes can show as a popover.</li>
+            </ul>
+          </div>
+        </details>
+      </div>
+
+    </div>
+
+    <!-- sidebar resize handle -->
+    <div id="sidebar-resize" title="Drag to resize" aria-hidden="true"></div>
+
+    <div id="canvas-wrap">
+      <canvas id="canvas"></canvas>
+      <div id="note-popover" class="hidden" role="tooltip"></div>
+    </div>
+  </div>
+
+  <!-- Edge label editor modal -->
+  <div id="edge-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Edit Connection</h3>
+      <label>Label text
+        <input id="edge-label" placeholder="e.g., related to, depends on"/>
+      </label>
+      <label>Image (URL or upload)</label>
+      <div class="row gap">
+        <input id="edge-image-url" placeholder="https://..."/>
+        <label class="file-btn small">
+          Upload
+          <input type="file" id="edge-image-file" accept="image/*"/>
+        </label>
+      </div>
+      <label>Image size
+        <input id="edge-image-size" type="range" min="40" max="240" value="120"/>
+      </label>
+      <div class="row right gap">
+        <button id="edge-save">Save</button>
+        <button id="edge-cancel" class="secondary">Cancel</button>
+        <button id="edge-clear" class="danger">Remove Image</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Note modal -->
+  <div id="note-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Edit Note</h3>
+      <div style="margin-bottom:8px;"><strong id="note-target-name"></strong></div>
+      <textarea id="note-text" style="width:100%;height:140px;border-radius:8px;padding:8px;"></textarea>
+      <div class="row right gap" style="margin-top:8px;">
+        <button id="note-save">Save</button>
+        <button id="note-cancel" class="secondary">Cancel</button>
+        <button id="note-clear" class="danger">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
