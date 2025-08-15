@@ -365,6 +365,10 @@ function draw(){
 
 function roundedRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
 
+function clickInSidebar(e) {
+  return e.target.closest('#sidebar') !== null;
+}
+
 // interactions
 canvas.addEventListener('mousemove',(e)=>{
   mouse.x = e.offsetX; mouse.y = e.offsetY;
@@ -446,6 +450,7 @@ function pickNode(px, py){
 
 
 canvas.addEventListener('mousedown',(e)=>{
+  if (clickInSidebar(e)) return;  
   mouse.x = e.offsetX; mouse.y = e.offsetY;
   const n = pickNode(mouse.x, mouse.y);
 
@@ -527,6 +532,7 @@ canvas.addEventListener('mousedown',(e)=>{
 
 
 canvas.addEventListener('mouseup',(e)=>{
+  if (clickInSidebar(e)) return;
   // Right-button release edge creation
   if (e.button === 2) {
     const n = pickNode(mouse.x, mouse.y);
@@ -574,14 +580,18 @@ canvas.addEventListener('wheel',(e)=>{ e.preventDefault(); const delta = Math.si
 // toggles edges explicitly, and recomputes hover after click to avoid stale highlight.
 canvas.addEventListener('click', (e) => {
   if (e.button !== 0) return;
+
   // If multi-select modifier is pressed, do nothing here.
   // (Ctrl/Cmd+click is handled on mousedown to toggle selection)
   const multiKey = e.ctrlKey || e.metaKey;
   if (multiKey) return;
-  // Use event coordinates (fresh) for picking — avoid any stale mouse.x
+
+  // Use fresh event coordinates for picking
   const n = pickNode(e.offsetX, e.offsetY);
+
+  // Click on empty canvas: clear selection
   if (!n) {
-    // click on empty canvas: clear selection
+    selectedNodes.clear();
     selectedNodeId = null;
     selectedGroupId = null;
     refreshUI();
@@ -589,41 +599,26 @@ canvas.addEventListener('click', (e) => {
     return;
   }
 
-  // center smoothly
+  // Center on the node
   flyTo(n, { scale: Math.max(0.9, world.camera.scale) });
 
-  // If user clicked the same node that is already selected -> toggle it off
-  if (selectedNodeId === n.id) {
-    selectedNodeId = null;
-    selectedGroupId = null;
-    // still toggle edges for the node (explicit boolean toggle)
-    pushUndo();
-    for (const ed of world.edges) {
-      if (ed.aId === n.id || ed.bId === n.id) ed.visible = !ed.visible;
-    }
-    // recompute hover immediately
-    hoverNodeId = pickNode(e.offsetX, e.offsetY)?.id || null;
-    refreshUI();
-    return;
-  }
-
-  // Otherwise select the new node
+  // Always toggle this node's edges (no "toggle-off if same node" branch)
   pushUndo();
-  // toggle edges for that node explicitly (boolean toggle)
   for (const ed of world.edges) {
     if (ed.aId === n.id || ed.bId === n.id) ed.visible = !ed.visible;
   }
 
-  // highlight in sidebar and mark selected
-  highlightInSidebar(n.id);
-  // ensure selectedNodeId is set (highlightInSidebar sets it, but keep explicit)
+  // Make this the single selection and update sidebar highlight
+  selectedNodes.clear();
+  selectedNodes.add(n.id);
   selectedNodeId = n.id;
+  selectedGroupId = (n.type === 'feature') ? n.groupId : n.id;
+  highlightInSidebar(n.id);
 
-  // recompute hover using event coords so draw uses consistent state
   hoverNodeId = pickNode(e.offsetX, e.offsetY)?.id || null;
-
   refreshUI();
 });
+
 
 
 // edge modal logic (simple implementation)
